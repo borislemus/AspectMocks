@@ -6,6 +6,7 @@ package org.logicdriven.testing;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -55,7 +56,14 @@ public class AspectMocks {
     }
 
     /**Checks wether a class is in the list of mocked classes.*/
-    public static boolean classIsMocked(Class objClass) {
-        return mockedClasses.contains(objClass);
+    public static boolean isMocked(Object obj) {
+        Iterator<Class> classItr = mockedClasses.iterator();
+        while (classItr.hasNext()) {
+            Class aux = classItr.next();
+            if (aux.isInstance(obj)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
