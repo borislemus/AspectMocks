@@ -31,7 +31,7 @@ import java.util.Map;
 public class AspectMocks {
 
     /**Maps a mocked method signature to its configured return value.*/
-    private static Map<String, Object> mockedMethods = new HashMap();
+    private static Map<String, Object> mockedMethods = new HashMap<String, Object>();
     /**The list of classes to be mocked.*/
     private static ArrayList<Class> mockedClasses = new ArrayList<Class>();
 
@@ -62,7 +62,14 @@ public class AspectMocks {
      */
     public static Object getMockReturnValue(String joinPointString) {
         String sig = parseJoinPoint(joinPointString);
-        return mockedMethods.get(sig);
+        System.out.println("--> Requested sig: " + sig);
+        Object val = null;
+        if (!mockedMethods.containsKey(sig)) {
+            System.out.println("  --> sig not found!!");
+        } else {
+            val = mockedMethods.get(sig);
+        }
+        return val;
     }
 
     /**Adds a class to be mocked.*/
@@ -76,6 +83,7 @@ public class AspectMocks {
         while (classItr.hasNext()) {
             Class aux = classItr.next();
             if (aux.isInstance(obj)) {
+                System.out.println("HIT!! isMocked -> " + obj.getClass().getName());
                 return true;
             }
         }
