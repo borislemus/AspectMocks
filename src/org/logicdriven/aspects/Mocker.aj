@@ -26,11 +26,17 @@ import org.aspectj.lang.Signature;
 
 /**The main aspect, instruments all public methods.*/
 public privileged aspect Mocker{
-    //Pointcutting all public methods except when executed from the AspectMocks class as this would cause a stack overflow
-    //when calling the isMocked(Object) method which would recursively advice the ArrayList.contains() method.
-    pointcut publicCalls(Object tgt): target(tgt) && call(public * *..*(..)) 
-        && !within(AspectMocks) && !call(* java.lang.*..*(..))
+    //Some common excluded pointcuts
+    pointcut exclusions(): !call(* AspectMocks.*(..)) && !within(AspectMocks) && !within(Mocker) && !call(* java.lang.*..*(..))
         && !call(* java.io.*..*(..)) && !call(* java.util.*..*(..));
+    //Pointcutting all public methods except when executed from the AspectMocks class as this would cause a stack overflow
+    //when calling the isMocked(Object) method which would recursively advice the ArrayList.contains() method. call(* *..*(..))
+    pointcut publicCalls(Object tgt): target(tgt) && (call(public * *..*(..)) || call(private * *..*(..)))
+        && exclusions();
+    //Pointcutting static methods: no target available.
+    pointcut staticCalls(): execution(static * *..*(..)) && exclusions();
+    //Pointcutting constructors.
+    pointcut constructorCalls(): call(*.new(..)) && !within(Mocker) && !within(AspectMocks) && !cflow(adviceexecution());
 
     Object around(Object tgt): publicCalls(tgt){
         //System.out.println(">> Object of type: " + tgt.getClass().getName());
@@ -47,18 +53,29 @@ public privileged aspect Mocker{
                 "\n   - JoinPoint: " + joinPointString + "\n");
                 System.out.println("   -> mocking with return value -> " + rtValue);
                 return rtValue;
-            }else{//Mock method not specified returning null
+            }else{//Mock method not specified, proceeding normally.
                 System.out.println("-> proceeding unmocked method.");
                 return proceed(tgt);
             }
         }
     }
 
-    //A pointcut and advice for private methods
-    //pointcut privateCalls(Object tgt): target(tgt) && call(private * com.logicdriven.*.*.*.*(..));
-
-    //Object around(Object tgt): privateCalls(tgt){
-      //  System.out.println(">> Private invocation intercepted -> " + thisJoinPoint.toString());
-      //  return proceed(tgt);
-    //}
+    Object around(): staticCalls(){
+        String joinPointString = thisJoinPoint.toString();
+        //System.out.println("Static JoinPoint -> " + joinPointString);
+        if(!AspectMocks.isMocked(thisJoinPointStaticPart.getSourceLocation().getWithinType())){
+            return proceed();
+        }else{
+            Object rtValue=null;
+            if((rtValue = AspectMocks.getMockReturnValue(joinPointString))!= null){
+                System.out.print(">> Intercepting Class: " + thisJoinPointStaticPart.getSourceLocation().getWithinType().getName() +
+                "\n   - JoinPoint: " + joinPointString + "\n");
+                System.out.println("   -> mocking with return value -> " + rtValue);
+                return rtValue;
+            }else{//Mock method not specified, proceeding normally.
+                System.out.println("-> proceeding unmocked method.");
+                return proceed();
+           }
+        }
+    }
 }
