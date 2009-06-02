@@ -39,4 +39,8 @@ public final class Collaborator {
     private int myPrivateMethod() {
         return 0;
     }
+
+    public static float aStaticMethod(){
+        return 0.5f;
+    }
 }

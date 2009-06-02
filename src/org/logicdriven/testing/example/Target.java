@@ -23,13 +23,18 @@ package org.logicdriven.testing.example;
  * An example test target class.
  * @author Boris Lemus
  */
-public final class Target {
+public class Target {
 
     Collaborator collab = new Collaborator();
 
     public int doSomething(Integer value) {
         int factor = collab.getFactor();
         collab.anotherFactor();
+        Collaborator.aStaticMethod();
         return (value * factor);
+    }
+
+    public void generateView(){
+        
     }
 }
