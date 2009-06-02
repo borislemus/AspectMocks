@@ -47,10 +47,12 @@ public class AspectMocks {
         aux.addMockMethod(methodSignature, returnValue);
     }
 
-    /**Obtain the return value that has been set for a particular method signature.
-     * The passed <code>joinPointString</code> is parsed internally to obtain the
-     * method signature.
+    /**Obtains the return value that has been set for a particular method signature
+     * on the <code>target</code> object. The passed <code>joinPointString</code>
+     * is parsed internally to obtain the method signature.
      * @param methodSignature the JoinPoint String representation as returned by JoinPoint.toString().
+     * @param target the object on which the method is being called. It could be a Class instance
+     * when the invoked method is static.
      * @return the return value configured for a mocked method or <code>null</code> if that method wasn't mocked.
      */
     public static Object getMockReturnValue(Object target, String joinPointString) {
@@ -128,6 +130,11 @@ public class AspectMocks {
             mockedMethods.put(methodSignature, returnValue);
         }
 
+        /**Obtains the return value that has been set for a particular method signature
+         * on this <code>ClassConfig</code>. The passed <code>joinPointString</code>
+         * is parsed internally to obtain the method signature.
+         * @param methodSignature the JoinPoint String representation as returned by JoinPoint.toString().
+         * @return the return value configured for a mocked method or <code>null</code> if that method wasn't mocked.*/
         public Object getMockReturnValue(String joinPointString) {
             String sig = parseJoinPoint(joinPointString);
             System.out.println("--> Requested sig: " + sig);
