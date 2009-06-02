@@ -82,7 +82,7 @@ public class AspectMocks {
         Iterator<Class> classItr = mockedClasses.iterator();
         while (classItr.hasNext()) {
             Class aux = classItr.next();
-            if (aux.isInstance(obj)) {
+            if ((obj instanceof Class) ? aux.equals(obj) : aux.isInstance(obj)) {
                 System.out.println("HIT!! isMocked -> " + obj.getClass().getName());
                 return true;
             }
