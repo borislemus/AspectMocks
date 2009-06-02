@@ -48,7 +48,7 @@ public privileged aspect Mocker{
             return proceed(tgt);
         }else{
             Object rtValue=null;
-            if((rtValue = AspectMocks.getMockReturnValue(joinPointString))!= null){
+            if((rtValue = AspectMocks.getMockReturnValue(tgt, joinPointString))!= null){
                 System.out.print(">> Intercepting. Object class: " + tgt.getClass().getName() +
                 "\n   - JoinPoint: " + joinPointString + "\n");
                 System.out.println("   -> mocking with return value -> " + rtValue);
@@ -63,11 +63,12 @@ public privileged aspect Mocker{
     Object around(): staticCalls(){
         String joinPointString = thisJoinPoint.toString();
         //System.out.println("Static JoinPoint -> " + joinPointString);
-        if(!AspectMocks.isMocked(thisJoinPointStaticPart.getSourceLocation().getWithinType())){
+        Class type = thisJoinPointStaticPart.getSourceLocation().getWithinType();
+        if(!AspectMocks.isMocked(type)){
             return proceed();
         }else{
             Object rtValue=null;
-            if((rtValue = AspectMocks.getMockReturnValue(joinPointString))!= null){
+            if((rtValue = AspectMocks.getMockReturnValue(type, joinPointString))!= null){
                 System.out.print(">> Intercepting Class: " + thisJoinPointStaticPart.getSourceLocation().getWithinType().getName() +
                 "\n   - JoinPoint: " + joinPointString + "\n");
                 System.out.println("   -> mocking with return value -> " + rtValue);
@@ -78,4 +79,18 @@ public privileged aspect Mocker{
            }
         }
     }
+
+    //Advicing constructors separately
+    Object around(): constructorCalls(){
+        System.out.println("->> around() constructor " + thisJoinPoint);
+        return new org.logicdriven.testing.example.Target();
+    }
+
+    //after() returning(Object tgt): constructorCalls(){
+    //    if(AspectMocks.isMocked(tgt)){
+    //        System.out.println("after() constructor of -> " + tgt.getClass().getName());
+    //        System.out.println("Changing the returned object has no effect here.");
+    //        tgt = new Integer(0);
+    //    }
+    //}
 }

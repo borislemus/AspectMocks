@@ -54,12 +54,12 @@ public class TargetTest {
 
     @Test
     public void testDoSomething() {
-        addMockClass(Collaborator.class);
-        //Mocking an instance method
-        addMockMethod("Collaborator.getFactor()", 5);
-        //Mocking a static method
-        addMockMethod("Collaborator.aStaticMethod()", 1.5f);
         System.out.println("doSomething");
+        //Mocking an instance method
+        addMockMethod(Collaborator.class,"getFactor()", 5);
+        //Mocking a static method
+        addMockMethod(Collaborator.class, "aStaticMethod()", 1.5f);
+        addMockMethod(Collaborator2.class, "someMethod(int)", "MyValue");
         Integer value = 10;
         Target instance = new Target();
         int expResult = 50;

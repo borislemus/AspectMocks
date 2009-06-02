@@ -31,6 +31,7 @@ public class Target {
         int factor = collab.getFactor();
         collab.anotherFactor();
         Collaborator.aStaticMethod();
+        new Collaborator2().someMethod(115);
         return (value * factor);
     }
 
